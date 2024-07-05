@@ -1,0 +1,47 @@
+version: "3.1"
+services:
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - 8000:80
+    volumes:
+      - ./.docker/metabase-data:/metabase-data
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: secret
+    depends_on:
+      - postgres
+    links:
+      - postgres
+
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: develop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      PGDATA: /var/lib/postgresql/data
+
+
+  redmin:
+    image: sasanrose/phpredmin
+    environment:
+      - PHPREDMIN_DATABASE_REDIS_0_HOST=redis
+      - PHPREDMIN_AUTH_USERNAME=root
+      - PHPREDMIN_AUTH_PASSWORD=secret
+    ports:
+      - "8002:80"
+    depends_on:
+      - redis
+    links:
+      - redis
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - 6379:6379
